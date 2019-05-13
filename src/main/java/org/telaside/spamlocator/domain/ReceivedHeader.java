@@ -2,10 +2,16 @@ package org.telaside.spamlocator.domain;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.telaside.spamlocator.service.HostHopFactory;
+
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
 
 public class ReceivedHeader {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(ReceivedHeader.class);
 	
 	private static final String FROM = "from ";
 	private static final int FROM_LENGTH = FROM.length();
@@ -16,8 +22,8 @@ public class ReceivedHeader {
 	private static final String FOR = "for <";
 	private static final int FOR_LENGTH = FOR.length();
 	
-	private String from;
-	private String by;
+	private HostHop from;
+	private HostHop by;
 	private String mailFor;
 
 	public static ReceivedHeader buildFromHeader(String header) {
@@ -41,6 +47,7 @@ public class ReceivedHeader {
 	
 	protected void extractFields(List<String> split) {
 		split.forEach((line) -> {
+			LOG.debug("Extracting from line [{}]", line);
 			if (line.startsWith(FROM)) {
 				extractFrom(line.substring(FROM_LENGTH));
 			} else if (line.startsWith(BY)) {
@@ -57,20 +64,18 @@ public class ReceivedHeader {
 	}
 
 	private void extractBy(String line) {
-		String[] split = line.split(" ");
-		this.by = split[0].trim();
+		this.by = HostHopFactory.buildHostHop(line);
 	}
 
 	private void extractFrom(String line) {
-		String[] split = line.split(" ");
-		this.from = split[0].trim();
+		this.from = HostHopFactory.buildHostHop(line);
 	}
 
-	public String getFrom() {
+	public HostHop getFrom() {
 		return from;
 	}
 
-	public String getBy() {
+	public HostHop getBy() {
 		return by;
 	}
 

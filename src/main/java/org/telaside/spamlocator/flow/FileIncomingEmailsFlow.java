@@ -26,6 +26,9 @@ public class FileIncomingEmailsFlow {
 	@Value("${spamlocator.input.files.inputdirectory:/tmp/spamlocator/}")
 	private String emailFileDirectory;
 	
+	@Value("${spamlocator.input.files.maxmessagesperpoll:500}")
+	private long maxFileIncomingMessages;
+	
 	@Bean
 	public MapToSpamLocator mapToSpamLocator() {
 		return new MapToSpamLocator();
@@ -43,7 +46,8 @@ public class FileIncomingEmailsFlow {
 		return IntegrationFlows.from(Files
 					.inboundAdapter(emailFileDirectoryFile)
 					.patternFilter("*.log")
-					.preventDuplicates(true), e -> e.poller(Pollers.fixedDelay(30, TimeUnit.SECONDS))
+					.preventDuplicates(true), e -> e.poller(Pollers.fixedDelay(500, TimeUnit.MILLISECONDS)
+							.maxMessagesPerPoll(maxFileIncomingMessages))
 				)
 				.handle(Files.splitter(false, false))
 				.transform(jsonToMapTransformer())

@@ -11,15 +11,17 @@ import org.telaside.spamlocator.domain.SpamLocatorMessage;
 public class MapToSpamLocator implements GenericTransformer<Map, SpamLocatorMessage> {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MapToSpamLocator.class);
-
+	
 	@Override
 	public SpamLocatorMessage transform(Map source) {
-		LOG.debug("Received {}", source);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("{} - Received {}", source.get("subject"));
+		}
+		
 		SpamLocatorMessage builtFromMap = SpamLocatorMessage.newBuilder()
 				.withHeaders((Map) source.get("headers"))
 				.withSubject((String) source.get("subject"))
 				.build();
-		LOG.debug("Returning {}", builtFromMap);
 		return builtFromMap;
 	}
 }

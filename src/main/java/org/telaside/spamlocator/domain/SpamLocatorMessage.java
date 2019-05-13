@@ -18,6 +18,10 @@ public class SpamLocatorMessage {
 	private List<ReceivedHeader> receivedHeaders = Lists.newArrayList();
 	private String subject;
 	
+	public List<ReceivedHeader> getReceivedHeaders() {
+		return receivedHeaders;
+	}
+	
 	public Map<String, Collection<String>> getHeaders() {
 		return headers;
 	}
