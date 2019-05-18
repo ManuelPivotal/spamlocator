@@ -1,1 +1,15 @@
-iptasck: 4e29f7bab704618e85540ac242154fdd
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/spamlocator
+    username: spamlocator
+    password: spamlocator
+  jpa:
+    properties:
+      hibernate:
+        temp:
+          use_jdbc_metadata_defaults: false
+        dialect: org.hibernate.dialect.PostgreSQL81Dialect
+    hibernate:
+      ddl-auto: update
+
+iptasck-url-template: http://api.ipstack.com/%s?access_key=4e29f7bab704618e85540ac242154fdd

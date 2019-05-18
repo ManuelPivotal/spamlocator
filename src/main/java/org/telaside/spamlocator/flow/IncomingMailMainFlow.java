@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.handler.LoggingHandler.Level;
 import org.telaside.spamlocator.handler.NetworkInformationHandler;
 
 @Configuration("IncomingMailMainFlowConf")
@@ -25,7 +24,6 @@ public class IncomingMailMainFlow {
 		LOG.info("Creating mainMailIntegrationFlow");
 		return IntegrationFlows.from(INPUT_MIME_MESSAGES_CHANNEL)
 				.handle(networkInformationHandler)
-				//.log(Level.INFO, "IncomingSpamLocatorMessage")
 				.nullChannel();
 	}
 }

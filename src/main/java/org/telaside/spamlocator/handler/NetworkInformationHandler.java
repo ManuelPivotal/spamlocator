@@ -1,20 +1,15 @@
 package org.telaside.spamlocator.handler;
 
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.telaside.spamlocator.domain.HostHop;
 import org.telaside.spamlocator.domain.ReceivedHeader;
 import org.telaside.spamlocator.domain.SpamLocatorMessage;
-
-import com.google.common.collect.Sets;
+import org.telaside.spamlocator.service.IPGeoLocationService;
 
 public class NetworkInformationHandler {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(NetworkInformationHandler.class);
-	private Set<String> names = Sets.newHashSet();
-	private int index = 0;
+	@Autowired
+	private IPGeoLocationService ipGeoLocationService;
 	
 	public SpamLocatorMessage handle(SpamLocatorMessage source) {
 		for (ReceivedHeader receivedHeader : source.getReceivedHeaders()) {
@@ -24,18 +19,8 @@ public class NetworkInformationHandler {
 	}
 	
 	private void enrichHostHop(HostHop hostHop) {
-		index++;
-		if (hostHop != null && hostHop.getName() != null && hostHop.getIp() == null) {
-			String name = hostHop.getName();
-			if (names.contains(name)) {
-				return;
-			}
-			if ("localhost".equals(name)) {
-				index--;
-				return;
-			}
-			names.add(name);
-			LOG.info("{}/{} - {} has no ip set", names.size(), index, hostHop.getName());
+		if (hostHop != null && hostHop.getName() != null && hostHop.getIp() != null) {
+			ipGeoLocationService.getLocalOrRemote(hostHop.getIp());
 		}
 	}
 }
