@@ -40,7 +40,7 @@ public class POP3IncomingEmailsFlow {
 		MailReceiver receiver = new Pop3MailReceiver("mail.nfrance.com", "m.meyer@telaside.com", "ju4m86p2"); //"pop3://m.meyer@telaside.com:ju4m86p2@mail.nfrance.com/INBOX");
 		MailReceivingMessageSource source = new MailReceivingMessageSource(receiver);
 		
-		return IntegrationFlows.from(source, e -> e.poller(Pollers.fixedDelay(30, TimeUnit.SECONDS).maxMessagesPerPoll(maxMessagePerPop3Polling)))
+		return IntegrationFlows.from(source, e -> e.poller(Pollers.fixedDelay(300, TimeUnit.SECONDS).maxMessagesPerPoll(maxMessagePerPop3Polling)))
 				.transform(integrationMimeMessageToSpamLocator())
 				.channel(INPUT_MIME_MESSAGES_CHANNEL)
 				.get();

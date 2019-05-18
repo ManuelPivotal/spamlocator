@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.telaside.spamlocator.handler.NetworkInformationHandler;
+import org.telaside.spamlocator.handler.SpamLocatorHandler;
 
 @Configuration("IncomingMailMainFlowConf")
 public class IncomingMailMainFlow {
@@ -19,11 +20,15 @@ public class IncomingMailMainFlow {
 	@Autowired
 	private NetworkInformationHandler networkInformationHandler;
 	
+	@Autowired
+	private SpamLocatorHandler spamLocatorHandler;
+	
 	@Bean
 	public IntegrationFlow mainMailIntegrationFlow() {
 		LOG.info("Creating mainMailIntegrationFlow");
 		return IntegrationFlows.from(INPUT_MIME_MESSAGES_CHANNEL)
 				.handle(networkInformationHandler)
+				.handle(spamLocatorHandler)
 				.nullChannel();
 	}
 }

@@ -32,9 +32,12 @@ public class IntegrationMimeMessageToSpamLocator implements GenericTransformer<M
 				LOG.info("Header {}={}", header.getName(), header.getValue());
 				headers.put(header.getName(), header.getValue());
 			}
+			
 			SpamLocatorMessage locatorMessage = SpamLocatorMessage.newBuilder()
 							.withHeaders(headers)
+							.withMessageId(source.getMessageID())
 							.withSubject(source.getSubject())
+							.withReplyToDateSentAndSender(source.getReplyTo(), source.getSentDate(), source.getSender())
 							.build();
 			LOG.info("Returning {}", locatorMessage);
 			return locatorMessage;

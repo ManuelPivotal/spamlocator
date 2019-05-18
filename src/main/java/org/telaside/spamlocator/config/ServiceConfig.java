@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.telaside.spamlocator.service.IPGeoLocationRemoteService;
 import org.telaside.spamlocator.service.IPGeoLocationService;
 import org.telaside.spamlocator.service.IpAddressExtractor;
+import org.telaside.spamlocator.service.SpamLocatorService;
 
 @Configuration
 public class ServiceConfig {
@@ -22,5 +23,10 @@ public class ServiceConfig {
 	@Bean
 	public IPGeoLocationService ipGeoLocationService() {
 		return new IPGeoLocationService();
+	}
+	
+	@Bean
+	public SpamLocatorService spamLocatorService() {
+		return new SpamLocatorService();
 	}
 }

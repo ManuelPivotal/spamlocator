@@ -2,6 +2,16 @@ package org.telaside.spamlocator.domain;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telaside.spamlocator.service.HostHopFactory;
@@ -9,6 +19,8 @@ import org.telaside.spamlocator.service.HostHopFactory;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
 
+@Entity
+@Table(name = "received_header")
 public class ReceivedHeader {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ReceivedHeader.class);
@@ -22,8 +34,20 @@ public class ReceivedHeader {
 	private static final String FOR = "for <";
 	private static final int FOR_LENGTH = FOR.length();
 	
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    private Long id;
+	
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "from_id", referencedColumnName = "id")
 	private HostHop from;
+
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "by_id", referencedColumnName = "id")
 	private HostHop by;
+	
+	@Column(name = "received_for")
 	private String mailFor;
 
 	public static ReceivedHeader buildFromHeader(String header) {

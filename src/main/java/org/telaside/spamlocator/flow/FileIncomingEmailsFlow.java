@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.Pollers;
@@ -18,7 +19,8 @@ import org.springframework.integration.file.dsl.Files;
 import org.springframework.integration.json.JsonToObjectTransformer;
 import org.telaside.spamlocator.transform.MapToSpamLocator;
 
-@Configuration
+@Profile("file")
+@Configuration("FileIncomingEmailsFlowConf")
 public class FileIncomingEmailsFlow {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(FileIncomingEmailsFlow.class);
