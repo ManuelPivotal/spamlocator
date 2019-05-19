@@ -29,7 +29,7 @@ public class MapToSpamLocator implements GenericTransformer<Map, SpamLocatorMess
 		SpamLocatorMessage builtFromMap = SpamLocatorMessage.newBuilder()
 				.withHeaders((Map) source.get("headers"))
 				.withSubject((String) source.get("subject"))
-				.withMessageId(messageId)
+				.withMessageIdAndReturnPath(messageId, extractFromList((List<String>)(((Map)source.get("headers"))).get("Return-Path")))
 				.build();
 		return builtFromMap;
 	}

@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.integration.transformer.GenericTransformer;
 import org.telaside.spamlocator.domain.SpamLocatorMessage;
 
-import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
+import com.google.common.collect.SetMultimap;
 
 public class IntegrationMimeMessageToSpamLocator implements GenericTransformer<MimeMessage, SpamLocatorMessage>{
 
@@ -22,9 +22,9 @@ public class IntegrationMimeMessageToSpamLocator implements GenericTransformer<M
 		try {
 			LOG.info(" ------------- Received {}", source);
 			Enumeration<Header> allHeaders = source.getAllHeaders();
-			ListMultimap<String, String> headers = MultimapBuilder
+			SetMultimap<String, String> headers = MultimapBuilder
 													.hashKeys()
-													.arrayListValues()
+													.hashSetValues()
 													.build();
 			
 			while(allHeaders.hasMoreElements()) {
@@ -35,7 +35,7 @@ public class IntegrationMimeMessageToSpamLocator implements GenericTransformer<M
 			
 			SpamLocatorMessage locatorMessage = SpamLocatorMessage.newBuilder()
 							.withHeaders(headers)
-							.withMessageId(source.getMessageID())
+							.withMessageIdAndReturnPath(source.getMessageID(), source.getHeader("Return-Path", ";"))
 							.withSubject(source.getSubject())
 							.withReplyToDateSentAndSender(source.getReplyTo(), source.getSentDate(), source.getSender())
 							.build();
