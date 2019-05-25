@@ -33,6 +33,8 @@ import com.google.gson.Gson;
 @Table(name = "spam_locator")
 public class SpamLocatorMessage {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(SpamLocatorMessage.class);
+	
 	static public final String RECEIVED_HEADER_FIELD = "Received";
 	static public final String RETURN_PATH = "Return-Path";
 	
@@ -132,7 +134,7 @@ public class SpamLocatorMessage {
 		public Builder withMessageIdAndReturnPath(String messageId, String returnPath) {
 			built.messageId = messageId;
 			if (messageId == null) {
-				LOG.error(" --> messageId is null");
+				LOG.warn("messageId is null");
 			}
 			built.returnPath = returnPath;
 			return this;
@@ -144,7 +146,6 @@ public class SpamLocatorMessage {
 				if (replyTo instanceof InternetAddress) {
 					InternetAddress internetAddress = (InternetAddress)replyTo;
 					built.replyTo = internetAddress.getAddress();
-					LOG.info(">>>> reply address {}", built.replyTo);
 				}
 			}
 			built.sentDate = sentDate;
@@ -160,6 +161,7 @@ public class SpamLocatorMessage {
 			built.extractHeaders();
 			built.buildHeaderEntrySet();
 			built.recordedDate = new Date();
+			built.induceMessage();
 			return built;
 		}
 	}
@@ -168,6 +170,28 @@ public class SpamLocatorMessage {
 		headers.get(RECEIVED_HEADER_FIELD).forEach((received) -> {
 			receivedHeaders.add(ReceivedHeader.buildFromHeader(received));
 		});
+	}
+
+	public void induceMessage() {
+		if (messageId == null) {
+			LOG.debug("Trying to induce messageid from received headers");
+			List<String> ids = Lists.newArrayList();
+			receivedHeaders.forEach(header -> {
+				HostHop hostHop = header.getBy();
+				if(hostHop != null) {
+					String byId = hostHop.getById();
+					if(byId != null) {
+						ids.add(byId);
+					}
+				}
+			});
+			if(!ids.isEmpty()) {
+				messageId = String.join("-", ids);
+				LOG.warn("Inducing message id to {}", messageId);
+				return;
+			}
+			LOG.error("Cannot induce message id");
+		}
 	}
 
 	public void buildHeaderEntrySet() {

@@ -1,5 +1,7 @@
 package org.telaside.spamlocator.transform;
 
+import static org.springframework.util.StringUtils.hasLength;
+
 import java.util.Enumeration;
 
 import javax.mail.Header;
@@ -8,6 +10,7 @@ import javax.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.integration.transformer.GenericTransformer;
+import org.springframework.util.StringUtils;
 import org.telaside.spamlocator.domain.SpamLocatorMessage;
 
 import com.google.common.collect.MultimapBuilder;
@@ -20,7 +23,7 @@ public class IntegrationMimeMessageToSpamLocator implements GenericTransformer<M
 	@Override
 	public SpamLocatorMessage transform(MimeMessage source) {
 		try {
-			LOG.info(" ------------- Received {}", source);
+			LOG.debug(" ------------- Received {}", source);
 			Enumeration<Header> allHeaders = source.getAllHeaders();
 			SetMultimap<String, String> headers = MultimapBuilder
 													.hashKeys()
@@ -29,7 +32,9 @@ public class IntegrationMimeMessageToSpamLocator implements GenericTransformer<M
 			
 			while(allHeaders.hasMoreElements()) {
 				Header header = allHeaders.nextElement();
-				LOG.info("Header {}={}", header.getName(), header.getValue());
+				if(LOG.isDebugEnabled()) {
+					LOG.debug("Header {}={}", header.getName(), header.getValue());
+				}
 				headers.put(header.getName(), header.getValue());
 			}
 			
@@ -39,7 +44,7 @@ public class IntegrationMimeMessageToSpamLocator implements GenericTransformer<M
 							.withSubject(source.getSubject())
 							.withReplyToDateSentAndSender(source.getReplyTo(), source.getSentDate(), source.getSender())
 							.build();
-			LOG.info("Returning {}", locatorMessage);
+			LOG.debug("Returning {}", locatorMessage);
 			return locatorMessage;
 		} catch(Exception e) {
 			LOG.error("Error while transforming message {}", source, e);

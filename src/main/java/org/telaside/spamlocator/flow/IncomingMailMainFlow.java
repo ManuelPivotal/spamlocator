@@ -9,6 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
+import org.telaside.spamlocator.domain.SpamLocatorMessage;
+import org.telaside.spamlocator.filter.SpamLocatorDuplicateFilter;
+import org.telaside.spamlocator.filter.SpamLocatorValidFilter;
 import org.telaside.spamlocator.handler.NetworkInformationHandler;
 import org.telaside.spamlocator.handler.SpamLocatorHandler;
 
@@ -23,12 +26,20 @@ public class IncomingMailMainFlow {
 	@Autowired
 	private SpamLocatorHandler spamLocatorHandler;
 	
+	@Autowired
+	private SpamLocatorValidFilter spamLocatorValidFilter;
+	
+	@Autowired
+	private SpamLocatorDuplicateFilter spamLocatorDuplicateFilter;
+	
 	@Bean
 	public IntegrationFlow mainMailIntegrationFlow() {
 		LOG.info("Creating mainMailIntegrationFlow");
 		return IntegrationFlows.from(INPUT_MIME_MESSAGES_CHANNEL)
-				.handle(networkInformationHandler)
-				.handle(spamLocatorHandler)
+				.<SpamLocatorMessage>filter(spamLocatorValidFilter)
+				.<SpamLocatorMessage>filter(spamLocatorDuplicateFilter)
+				.<SpamLocatorMessage>handle((m, h) -> networkInformationHandler.hostHops(m))
+				.<SpamLocatorMessage>handle((m, h) -> spamLocatorHandler.save(m))
 				.nullChannel();
 	}
 }

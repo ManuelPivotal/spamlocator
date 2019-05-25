@@ -11,7 +11,7 @@ public class NetworkInformationHandler {
 	@Autowired
 	private IPGeoLocationService ipGeoLocationService;
 	
-	public SpamLocatorMessage handle(SpamLocatorMessage source) {
+	public SpamLocatorMessage hostHops(SpamLocatorMessage source) {
 		for (ReceivedHeader receivedHeader : source.getReceivedHeaders()) {
 			enrichHostHop(receivedHeader.getFrom());
 		}

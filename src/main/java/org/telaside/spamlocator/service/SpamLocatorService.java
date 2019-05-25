@@ -17,9 +17,17 @@ public class SpamLocatorService {
 	@Transactional(readOnly = false)
 	public void save(SpamLocatorMessage spamLocatorMessage) {
 		if (spamLocatorMessage.getMessageId() != null) {
+			LOG.debug("Saving {}", spamLocatorMessage);
 			spamLocatorRepository.save(spamLocatorMessage);
 			return;
 		}
 		LOG.error("Skipping {} - no message id", spamLocatorMessage.getSubject());
+	}
+
+	public boolean exists(SpamLocatorMessage spamLocatorMessage) {
+		String messageId = spamLocatorMessage.getMessageId();
+		boolean exists = messageId != null && spamLocatorRepository.existsById(messageId);
+		LOG.debug("Message {} already exists is {}", messageId, exists);
+		return exists;
 	}
 }

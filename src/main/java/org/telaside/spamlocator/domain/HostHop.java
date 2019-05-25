@@ -24,13 +24,17 @@ public class HostHop {
     @Column(name = "host_hop_ip")
     private String ip;
     
-    public HostHop() { // JPA needs this.
+    @Column(name = "by_id")
+    private String byId;
+    
+    public HostHop() {
     	
     }
-	
-	public HostHop(String name, String ip) {
+    
+	public HostHop(String name, String ip, String byId) {
 		this.name = name;
 		this.ip = ip;
+		this.byId = byId;
 	}
 	
 	public String getName() {
@@ -45,11 +49,16 @@ public class HostHop {
 		this.ip = ip;
 	}
 	
+	public String getById() {
+		return byId;
+	}
+
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
 				.add("name", name)
 				.add("ip", ip)
+				.add("byId", byId)
 				.toString();
 	}
 }
