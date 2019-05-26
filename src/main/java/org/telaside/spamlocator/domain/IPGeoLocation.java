@@ -31,6 +31,9 @@ public class IPGeoLocation {
 	@Id
 	private String ip;
 	
+	@Column(name="geo_org")
+	private String organisation;
+	
 	@Column(name="ip_type")
 	private String type;
 	
@@ -75,6 +78,13 @@ public class IPGeoLocation {
 	}
 	public void setIp(String ip) {
 		this.ip = ip;
+	}
+	
+	public String getOrganisation() {
+		return organisation;
+	}
+	public void setOrganisation(String organisation) {
+		this.organisation = organisation;
 	}
 	
 	public String getType() {

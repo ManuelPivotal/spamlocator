@@ -30,10 +30,12 @@ public class ScheduledTasks {
 	public void findAndSaveUnsetIPGeoLocations() {
 		LOG.debug("Getting unset IPs");
 		Set<String> unsetIps = spamLocatorService.findUnsetIpGeolocation();
-		LOG.debug("Unset IPs are {}", unsetIps);
-		unsetIps.forEach(ip -> {
-			IPGeoLocation found = iPGeoLocationService.getLocalOrRemote(ip);
-			LOG.debug("Found {} for {}", found, ip);
-		});
+		if(!unsetIps.isEmpty()) {
+			LOG.info("Unset IPs are {}", unsetIps);
+			unsetIps.forEach(ip -> {
+				IPGeoLocation found = iPGeoLocationService.getLocalOrRemote(ip);
+				LOG.info("Found {} for {}", found, ip);
+			});
+		}
 	}
 }

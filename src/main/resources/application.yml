@@ -11,5 +11,9 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQL81Dialect
     hibernate:
       ddl-auto: update
-
-iptasck-url-template: http://api.ipstack.com/%s?access_key=4e29f7bab704618e85540ac242154fdd
+      
+spamlocator:
+  geo-localisation:
+    iptasck-url-template: http://api.ipstack.com/%s?access_key=4e29f7bab704618e85540ac242154fdd
+    ipinfo-url-template: http://ipinfo.io/%s?e8a6d6a0315e37
+    use-ipinfo: false
