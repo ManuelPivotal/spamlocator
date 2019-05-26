@@ -2,6 +2,7 @@ package org.telaside.spamlocator.flow;
 
 import static org.telaside.spamlocator.domain.ChannelNames.INPUT_MIME_MESSAGES_CHANNEL;
 
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -13,7 +14,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.dsl.Pollers;
-import org.springframework.integration.mail.MailReceiver;
 import org.springframework.integration.mail.MailReceivingMessageSource;
 import org.springframework.integration.mail.Pop3MailReceiver;
 import org.telaside.spamlocator.transform.IntegrationMimeMessageToSpamLocator;
@@ -34,13 +34,27 @@ public class POP3IncomingEmailsFlow {
 	}
 	
 	@Bean
+	public Pop3MailReceiver pop3MailReceiver() {
+		Properties javaMailProperties = new Properties();
+		javaMailProperties.put("mail.debug", "true");
+		
+		Pop3MailReceiver receiver = new Pop3MailReceiver("mail.nfrance.com", "m.meyer@telaside.com", "ju4m86p2");
+		receiver.setJavaMailProperties(javaMailProperties);
+		return receiver;
+	}
+
+	@Bean
 	public IntegrationFlow pop3SourceIntegrationFlow() throws Exception {
 		LOG.info("Starting an incoming pop3 email reader");
 		
-		MailReceiver receiver = new Pop3MailReceiver("mail.nfrance.com", "m.meyer@telaside.com", "ju4m86p2"); //"pop3://m.meyer@telaside.com:ju4m86p2@mail.nfrance.com/INBOX");
-		MailReceivingMessageSource source = new MailReceivingMessageSource(receiver);
+		MailReceivingMessageSource source = new MailReceivingMessageSource(pop3MailReceiver());
 		
-		return IntegrationFlows.from(source, e -> e.poller(Pollers.fixedDelay(5, TimeUnit.MINUTES).maxMessagesPerPoll(maxMessagePerPop3Polling)))
+		return IntegrationFlows.from(source, e -> 
+					e.poller(Pollers
+							.fixedDelay(5, TimeUnit.MINUTES)
+							.maxMessagesPerPoll(maxMessagePerPop3Polling)
+					)
+				)
 				.transform(integrationMimeMessageToSpamLocator())
 				.channel(INPUT_MIME_MESSAGES_CHANNEL)
 				.get();

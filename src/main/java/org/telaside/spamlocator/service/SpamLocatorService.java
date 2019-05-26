@@ -1,5 +1,7 @@
 package org.telaside.spamlocator.service;
 
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +26,15 @@ public class SpamLocatorService {
 		LOG.error("Skipping {} - no message id", spamLocatorMessage.getSubject());
 	}
 
+	@Transactional(readOnly = true)
 	public boolean exists(SpamLocatorMessage spamLocatorMessage) {
 		String messageId = spamLocatorMessage.getMessageId();
 		boolean exists = messageId != null && spamLocatorRepository.existsById(messageId);
 		LOG.debug("Message {} already exists is {}", messageId, exists);
 		return exists;
+	}
+	
+	public Set<String> findUnsetIpGeolocation() {
+		return spamLocatorRepository.findUnsetIpGeolocation();
 	}
 }
