@@ -16,10 +16,7 @@ public class LineInfoExtractor {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(LineInfoExtractor.class);
 
-	private static final String IPADDRESS_PATTERN = "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
-			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." 
-			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
-			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])";
+	private static final String IPADDRESS_PATTERN = "(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
 
 	private Pattern ipAddressPattern = Pattern.compile(IPADDRESS_PATTERN);
 	
@@ -30,6 +27,7 @@ public class LineInfoExtractor {
 	private static final Pattern esmtpIdPattern = Pattern.compile(WITH_ESMTP_PATTERN);
 
 	public LineInfoExtractor() {
+		LOG.info("IpPattern : {}", IPADDRESS_PATTERN);
 	}
 
 	public String extractIpAddress(String ip) {
@@ -38,10 +36,10 @@ public class LineInfoExtractor {
 			List<String> ipFounds = Lists.newArrayList();
 			while (matcher.find()) {
 				int groupCount = matcher.groupCount();
-				if (LOG.isDebugEnabled()) {
-					LOG.debug("Found IP in {}", ip);
-					for(int index = 0; index < groupCount; index++) {
-						LOG.debug("Matcher group {} index {}", matcher.group(index), index);
+				if (LOG.isInfoEnabled()) {
+					LOG.info("Found IP in {}", ip);
+					for(int index = 0; index <= groupCount; index++) {
+						LOG.info("Matcher group {} index {}", matcher.group(index), index);
 					}
 				}
 				ipFounds.add(matcher.group(0));

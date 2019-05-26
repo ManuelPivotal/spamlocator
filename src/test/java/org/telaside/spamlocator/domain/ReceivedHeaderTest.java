@@ -1,6 +1,7 @@
 package org.telaside.spamlocator.domain;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -12,7 +13,8 @@ public class ReceivedHeaderTest {
 
 	@Test
 	public void canBuildFromSimpleHeader() throws Exception {
-		String receivedheader = "from mail-blue-antispam1.nfrance.com ([192.168.42.31])\r\n" + 
+		String receivedheader = 
+				"from mail-blue-antispam1.nfrance.com ([192.168.42.31])\r\n" + 
 				"	by mail-green-filer1.lan.nfrance.net with LMTP id 2IvlECaHrVxKbgAAGvI7SA\r\n" + 
 				"	for <pop124924@mail-green.nfrance.com>; Wed, 10 Apr 2019 08:03:18 +0200";
 		
@@ -24,6 +26,18 @@ public class ReceivedHeaderTest {
 		assertEquals("192.168.42.31", underTest.getFrom().getIp());
 		assertEquals("mail-green-filer1.lan.nfrance.net", underTest.getBy().getName());
 		assertEquals("pop124924@mail-green.nfrance.com", underTest.getMailFor());
+	}
+	
+	@Test
+	public void canBuildFromWith3digitsIp() {
+		String anotherFrom = "from ec2-52-50-66-209.eu-west-1.compute.amazonaws.com (HELO localhost) (52.50.66.209)";
+		ReceivedHeader underTest = ReceivedHeader.buildFromHeader(anotherFrom);
+		
+		LOG.info("Received header {}", underTest);
+		
+		assertEquals("52.50.66.209", underTest.getFrom().getIp());
+		assertEquals("ec2-52-50-66-209.eu-west-1.compute.amazonaws.com", underTest.getFrom().getName());
+		assertNull(underTest.getBy());
 	}
 	
 	@Test
