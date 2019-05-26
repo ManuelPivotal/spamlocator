@@ -1,11 +1,16 @@
 package org.telaside.spamlocator.service;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
+import com.google.common.collect.Lists;
 
 public class LineInfoExtractor {
 	
@@ -15,6 +20,7 @@ public class LineInfoExtractor {
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." 
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
 			+ "([01]?\\d\\d?|2[0-4]\\d|25[0-5])";
+
 	private Pattern ipAddressPattern = Pattern.compile(IPADDRESS_PATTERN);
 	
 	private static final String WIHT_LMTP_ID = "with[\\s]+LMTP[\\s]+id[\\s]+([\\S]*)";
@@ -26,22 +32,40 @@ public class LineInfoExtractor {
 	public LineInfoExtractor() {
 	}
 
-	public String extractIpAddress(String ip ) {
+	public String extractIpAddress(String ip) {
 		if (StringUtils.hasLength(ip)) {
 			Matcher matcher = ipAddressPattern.matcher(ip);
-			if (matcher.find()) {
+			List<String> ipFounds = Lists.newArrayList();
+			while (matcher.find()) {
 				int groupCount = matcher.groupCount();
 				if (LOG.isDebugEnabled()) {
 					LOG.debug("Found IP in {}", ip);
 					for(int index = 0; index < groupCount; index++) {
-						LOG.info("Matcher group {} index {}", matcher.group(index), index);
+						LOG.debug("Matcher group {} index {}", matcher.group(index), index);
 					}
 				}
-				return matcher.group(0);
+				ipFounds.add(matcher.group(0));
 			}
+			return bestIpInList(ipFounds);
 		}
 		LOG.debug("No IP pattern found in {}", ip);
 		return null;
+	}
+
+	private String bestIpInList(List<String> ipFounds) {
+		if(CollectionUtils.isEmpty(ipFounds)) {
+			return null;
+		}
+		
+		if(ipFounds.size() == 1) {
+			return ipFounds.get(0);
+		}
+		
+		Optional<String> found = ipFounds
+				.stream()
+				.filter(ip -> !(ip.startsWith("192.168") || ip.startsWith("127.0")))
+				.findFirst();
+		return found.isPresent() ? found.get() : null;
 	}
 
 	public String extraInternalId(String line) {
